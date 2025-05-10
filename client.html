@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat App</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom right, #00fcca, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .chat-container {
+      width: 400px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      background: #2196f3;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    .chat-form {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      margin-right: 10px;
+      outline: none;
+    }
+    .chat-submit {
+      background: #2196f3;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .message-group {
+      margin-bottom: 10px;
+    }
+    .message {
+      background: #e0e0e0;
+      padding: 8px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      max-width: 80%;
+    }
+    .message-own {
+      background: #2196f3;
+      color: white;
+      align-self: flex-end;
+    }
+    .message-time {
+      font-size: 10px;
+      color: #999;
+      margin-top: 2px;
+    }
+    .message-system {
+      text-align: center;
+      color: #888;
+      margin: 10px 0;
+    }
+    .notification {
+      position: absolute;
+      top: 10px;
+      background: #3df321;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: none;
+      font-size: 14px;
+      z-index: 1000;
+    }
+    .notification.show {
+      display: block;
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: red;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .status-connected {
+      background: rgb(0, 255, 4) !important;
+    }
+    .status-disconnected {
+      background: red !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="notification" id="notification">
+    <i class="fas fa-bell"></i> <span>Pesan baru diterima</span>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-title">Chat App</div>
+      <div class="status-indicator">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Menghubungkan...</span>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages"></div>
+
+    <div class="chat-form">
+      <input type="text" class="chat-input" id="message-input" placeholder="Tulis pesan...">
+      <button class="chat-submit" id="send-button">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const notification = document.getElementById('notification');
+
+    let currentDay = new Date().toLocaleDateString();
+
+    function getCurrentTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function checkNewDay() {
+      const today = new Date().toLocaleDateString();
+      if (today !== currentDay) {
+        const dayDivider = document.createElement('div');
+        dayDivider.className = 'day-divider';
+        dayDivider.innerHTML = `<span>${today}</span>`;
+        chatMessages.appendChild(dayDivider);
+        currentDay = today;
+      }
+    }
+
+    function addMessage(message, type = 'other') {
+      const messageGroup = document.createElement('div');
+      messageGroup.classList.add('message-group');
+      messageGroup.classList.add(type);
+
+      if (type === 'system') {
+        const systemMessage = document.createElement('div');
+        systemMessage.className = 'message-system';
+        systemMessage.textContent = message;
+        chatMessages.appendChild(systemMessage);
+      } else {
+        const messageBubble = document.createElement('div');
+        messageBubble.className = `message ${type === 'own' ? 'message-own' : 'message-other'}`;
+        messageBubble.textContent = message;
+
+        const time = document.createElement('div');
+        time.className = 'message-time';
+        time.textContent = getCurrentTime();
+
+        messageGroup.appendChild(messageBubble);
+        messageGroup.appendChild(time);
+
+        chatMessages.appendChild(messageGroup);
+      }
+
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    const socket = new WebSocket('ws://127.0.0.1:8080');
+
+    socket.onopen = function() {
+      statusDot.classList.add('status-connected');
+      statusText.textContent = 'Online';
+      addMessage('Selamat datang di chat!', 'system');
+    };
+
+    socket.onclose = function() {
+      statusDot.classList.remove('status-connected');
+      statusDot.classList.add('status-disconnected');
+      statusText.textContent = 'Offline';
+      addMessage('Terputus dari server.', 'system');
+    };
+
+    socket.onerror = function(error) {
+      statusDot.classList.remove('status-connected');
+      statusDot.classList.add('status-disconnected');
+      statusText.textContent = 'Error';
+      addMessage('Koneksi gagal.', 'system');
+      console.error('WebSocket Error:', error);
+    };
+
+    socket.onmessage = function(event) {
+      if (event.data instanceof Blob) {
+        event.data.text().then(text => {
+          processMessage(text);
+        });
+      } else {
+        processMessage(event.data);
+      }
+
+      if (!document.hasFocus()) {
+        notification.classList.add('show');
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 3000);
+      }
+    };
+
+    function processMessage(message) {
+      checkNewDay();
+      if (message.startsWith('User lain:')) {
+        const content = message.substring(10).trim();
+        addMessage(content, 'other');
+      } else {
+        addMessage(message, 'system');
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message === '' || socket.readyState !== WebSocket.OPEN) {
+        return;
+      }
+      socket.send(message);
+      addMessage(message, 'own');
+      messageInput.value = '';
+    }
+  </script>
+</body>
+</html>
