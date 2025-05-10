@@ -69,9 +69,9 @@ Buka file `index.html` di browser Anda.
 
 ## 📖 Hasil Eksperimen
 
-![Screenshot 2025-05-10 233407](https://github.com/user-attachments/assets/c83f5117-d53d-43ff-bc08-491c62528cd5)
-![Screenshot 2025-05-10 233322](https://github.com/user-attachments/assets/e36094d7-36a0-4d87-9bd3-6b417ec979e6)
-![Screenshot 2025-05-10 233315](https://github.com/user-attachments/assets/94232466-d626-457c-981f-384c9f890e11)
+-  ![Screenshot 2025-05-10 233407](https://github.com/user-attachments/assets/c83f5117-d53d-43ff-bc08-491c62528cd5)
+-  ![Screenshot 2025-05-10 233322](https://github.com/user-attachments/assets/e36094d7-36a0-4d87-9bd3-6b417ec979e6)
+-  ![Screenshot 2025-05-10 233315](https://github.com/user-attachments/assets/94232466-d626-457c-981f-384c9f890e11)
 
 
 * WebSocket terbukti mendukung komunikasi real-time tanpa polling.
@@ -87,10 +87,3 @@ Buka file `index.html` di browser Anda.
 
 Repositori ini dibuat untuk keperluan **eksperimen** dan **pembelajaran**.
 Silakan gunakan dan modifikasi sesuai kebutuhan Anda.
-
-```
-
-Anda bisa menyalin langsung teks di atas ke file `README.md` dalam repositori GitHub Anda.
-
-Perlu dibantu juga membuatkan versi PDF atau ingin saya buatkan struktur repositori GitHub-nya?
-```
