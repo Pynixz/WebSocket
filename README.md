@@ -42,15 +42,7 @@ Semua komunikasi berlangsung secara langsung melalui WebSocket, tanpa reload hal
 - **Backend**: Node.js + `ws` (WebSocket library)
 - **Library Tambahan**: Font Awesome (untuk ikon)
 
-## 🚀 Cara Menjalankan
-
-Clone repository ini:
-
-```bash
-git clone https://github.com/username/go-chat.git
-cd go-chat
 ````
-
 Install dependensi:
 
 ```bash
