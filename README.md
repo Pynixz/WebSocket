@@ -1,6 +1,6 @@
 Berikut adalah versi README yang siap Anda gunakan untuk GitHub, sudah disesuaikan dengan nama dan NIM baru:
 
-````markdown
+
 # Go Chat - Eksperimen Aplikasi Chat Real-Time dengan WebSocket 🚀
 
 ## 📋 Informasi Mahasiswa
